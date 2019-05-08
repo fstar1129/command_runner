@@ -1,12 +1,10 @@
-> [Command Runner]
-
-
-## IMG Scanner website contains:
+## Command Runner website contains:
 * Run command and provide Link of output.
 
 
 
 ## Usage :
+Input command and get the link for result
 ### Run project by :
 
 ``` python
