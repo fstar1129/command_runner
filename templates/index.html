@@ -1,73 +1,185 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>IMG Scanner</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="shortcut icon" href="{% static 'fav.png' %}" type="image/x-icon">
-  </head>
+<html lang="en" style="height:50vh">
+<head>
+  <title>Bootstrap 4 Website Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="shortcut icon" href="{% static 'fav.png' %}" type="image/x-icon">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <!-- <script src='https://www.google.com/recaptcha/api.js'></script> -->
+  <style>
+  .fakeimg {
+    height: 200px;
+    background: #aaa;
+  }
+  .form1{
+    margin-bottom: 50px;
+  }
+  .input{
+    background-color: rgb(71, 0, 163);
+    color: white;
+    padding: 50px;
+  }
+  .form-control{
+    margin-bottom:20px;
+  }
+  </style>
+</head>
+<body style="height:100%">
 
-  <body>
-    
-    <div class="container"></div>
-      <div class="col">
-        <div class="text-center">
-          <h1 class="display-4 my-4">Command Runner</h1>
-          <h1 class="display-4">Developed By : <a href="" target="_blank">???</a></h1>
-        </div>
-        <br>
-        <br>
-        <form action="." method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="input-group">
-            <div class="custom-file">
-              <select name="cmd">
-                {% for command in cmd_list %}
-                    <option value="{{ command }}">{{ command }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="submit">Scan</button>
-            </div>
+<div class="jumbotron text-center" style="margin-bottom:0">
+  <h1>Port Scanner</h1>
+  <p>Enter the script, then you will get the url of result.</p> 
+</div>
+
+<nav class="navbar navbar-expand-lg bg-light">
+  <a class="navbar-brand" href="#">Home</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="#"></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"></a>
+      </li>    
+    </ul>
+  </div>  
+</nav>
+
+<div class="container-fluid">
+  <form>
+    {% csrf_token %}
+    <div class="row input">
+      <div class="col-sm-8">
+          <div class="form-group">
+            <label for="usr" style="font-size:2em">Select the script!</label>
+            <select name="script" class="form-control" onchange="cScript(this)">
+                <option value="">Select the script.</option>
+              {% for command in all_command %}
+                <option value="{{ command.id }}">{{ command.name }}</option>
+              {% endfor %}
+            </select>
+            <div id='params'></div>
           </div>
-        </form>
-
-        <br>
-        <br>
-        
-        {% if message %}
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+          <!-- <div class="g-recaptcha" data-sitekey="6LfoHRwUAAAAAE0OdCh76Tc4HuxlGrIBGjr6Ymql"></div> -->
+          <div class="form-group">
+            <button type="button" id="run_script" class="btn btn-danger">Scan now!</button>
           </div>
-        {% endif %}
-
+      </div>
+      <div class="col-sm-4">
+        <div id="result"></div>
       </div>
     </div>
+  </form>
+</div>
 
-    <script type="text/javascript">
-      function copyContent() {
-        copy(document.getElementById('content').textContent)
+<div class="jumbotron text-center" style="margin-bottom:auto;height: 100%">
+  <p></p>
+</div>
+<script>
+  function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
       }
-      function copy(text) {
-        let copyText = document.createElement("textarea");
-        document.body.appendChild(copyText);
-        copyText.value = text;
-        copyText.select();
-        document.execCommand("copy");
-        document.body.removeChild(copyText);
-      }
-    </script>
+      return cookieValue;
+  }
+  var csrftoken = getCookie('csrftoken');
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  </body>
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+
+  function cScript(a){
+    $.ajax({
+      url: "change_script/",
+      type: "POST",
+      data: { script_id: a.value},
+      success : function(json) {
+            var str = "";
+            var data = jQuery.parseJSON(json);
+            console.log(data);
+            data.forEach(function(param, key, d){
+              str += "<input dir='"+ param.fields.format +"' id='"+ param.pk +"' name='"+ param.fields.name +"'type='text' class='form-control' placeholder='"+ param.fields.name +"'>";
+            });
+            $("#params").html(str);
+      }
+    });
+  }
+  $( document ).ready(function() {
+    $("#run_script").click(function(){
+      // e.preventDefault();
+      
+      var formArray = $('form').serializeArray();
+      var param = [];
+      for(var i = 0; i < formArray.length; i++){
+        if(formArray[i].value === "") {
+          alert("Fill into all input forms!");
+          break;
+        }
+        if(i > 1){
+          var rg = new RegExp($("[name='"+ formArray[i].name +"']").attr("dir"));
+          if(rg.exec(formArray[i].value) === null){
+            alert("Fill into valid input!");
+            break;
+          }else{
+            param.push({'id': $("[name='"+ formArray[i].name +"']").attr("id"), 'value': $("[name='"+ formArray[i].name +"']").val()});
+          }
+        }
+      }
+      if(param.length !== 0){
+        var data = {
+            script: formArray[1].value,
+            param: param
+          };
+        $("#run_script").attr("disabled", true);
+        $.ajax({
+          url: "run_script/",
+          type: "POST",
+          data: {
+            'script': formArray[1].value,
+            'param[]': JSON.stringify(param)
+          },
+          success: function(url) {
+              if(url === "error") {
+                alert("Error occurred!");
+                $("#run_script").attr("disabled", false);
+              }else{
+                window.location.href = "result/"+url;
+              }
+          }
+        });
+      }
+    });
+  });
+</script>
+</body>
 </html>

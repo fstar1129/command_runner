@@ -1,0 +1,94 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" style="height:50vh">
+<head>
+  <title>Bootstrap 4 Website Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="shortcut icon" href="{% static 'fav.png' %}" type="image/x-icon">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <style>
+  .fakeimg {
+    height: 200px;
+    background: #aaa;
+  }
+  .form1{
+    margin-bottom: 50px;
+  }
+  .input{
+    background-color: rgb(71, 0, 163);
+    color: white;
+    padding: 50px;
+  }
+  .form-control{
+    margin-bottom:20px;
+  }
+  .copyform{
+    position: absolute;
+    left: -9999px;
+  }
+  </style>
+</head>
+<body style="height:100%">
+
+<div class="jumbotron text-center" style="margin-bottom:0">
+  <h1>Port Scanner</h1>
+  <p>Enter the script, then you will get the url of result.</p> 
+</div>
+
+<nav class="navbar navbar-expand-lg bg-light">
+  <a class="navbar-brand" href="/">Home</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="#"></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"></a>
+      </li>    
+    </ul>
+  </div>  
+</nav>
+
+<div class="container-fluid">
+  <p>Position</p>
+  <h2 style="color:#4700a3">{{ queue.id }}</h2>
+  <p>Script: <span style="color:#4700a3">{{ queue.script_id.name}}</span></p>
+  <p>YOUR SCAN RESULT LINK:</p>
+  <a href="localhost:8000/result/{{ queue.uuid }}">localhost:8000/result/{{ queue.uuid }}</a>
+  <button onclick="myFunction()" style="background-color:transparent;border-color:transparent"><img src="{% static 'icons8-copy-link-26.png' %}" width="20px" height="20px"></button>
+  <input type="text" value="localhost:8000/result/{{ queue.uuid }}" id="myInput" class="copyform">
+  <p>DATE:<span style="color:#4700a3">{{ queue.dateOut }}</span></p>
+  <p>RESULT:</p>
+  <p id="result" style="border: 1px solid grey;padding:5px;"></p>
+</div>
+
+<div class="jumbotron text-center" style="margin-bottom:auto;height: 100%">
+  <p></p>
+</div>
+<script>
+  var result ='{{ result }}';
+  result = result.replace(/&lt;/gi, "<");
+  result = result.replace(/&gt;/gi, ">");
+  $("#result").html(result);
+  function myFunction() {
+    var copyText = document.getElementById("myInput");
+
+    copyText.select();
+
+    document.execCommand("copy");
+
+  }
+</script>
+</body>
+</html>

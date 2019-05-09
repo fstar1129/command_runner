@@ -13,9 +13,10 @@ class Script_command(models.Model):
 
 class Queue(models.Model):
     script_id = models.ForeignKey(Script, on_delete=models.CASCADE)
-    result = models.TextField()
-    dateIn = models.DateField()
-    dateOut = models.DateField()
+    uuid = models.CharField(max_length=40)
+    result = models.TextField(null=True)
+    dateIn = models.DateTimeField()
+    dateOut = models.DateTimeField(null=True)
 
 class QParam(models.Model):
     queue_id = models.ForeignKey(Queue, on_delete=models.CASCADE)
