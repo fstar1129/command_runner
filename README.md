@@ -10,14 +10,19 @@ Input command and get the link for result
 ``` python
 
 # change database connection information in settings.py DATABASES default values with your info then run 
+1. pip install -r requirements.txt
 
-1. python manage.py migrate
+2. install redis
 
-2. python manage.py runserver
+3. run redis-service
 
-# if you want to manage to project just create super user account by :
+4. run redis-cli
 
-3. python manage.py createsuperuser
+5. celery worker -A scan --loglevel=debug --concurrency=4
+
+6. python manage.py migrate
+
+7. python manage.py runserver
 
 ```
 
