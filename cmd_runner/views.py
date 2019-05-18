@@ -45,7 +45,7 @@ def run_script(request):
             index += 1
         run_script_task.delay(q.id, command)
 
-        return HttpResponse(json.dumps(q.id), content_type="application/json")
+        return HttpResponse(json.dumps(u.hex), content_type="application/json")
 def result(request, uuid):
     if request.method == "GET":
         q = Queue.objects.get(uuid=uuid)
