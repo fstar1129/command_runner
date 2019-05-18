@@ -4,9 +4,11 @@ from .models import Script, Script_command, Queue, QParam
 import json
 from django.core import serializers
 import datetime
-import subprocess
+import os
 import uuid
 import html
+import time
+from cmd_runner.tasks import run_script_task
 
 def index(request):
     all_command = Script.objects.all()
@@ -31,6 +33,7 @@ def run_script(request):
         u = uuid.uuid4()
         q = Queue(dateIn=currentDT, script_id=script, uuid=u.hex)
         q.save()
+        
         k = 1
         command = script.command
         index = 0
@@ -40,19 +43,9 @@ def run_script(request):
             qp.save()
             command = command.replace("%"+str(index + 1), i['value'])
             index += 1
-        try:
-            MyOut = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            stdout,stderr = MyOut.communicate()
-        except:
-            return HttpResponse(json.dumps("error"), content_type="application/json")
-        result = str(stdout)[2:-1]
-        mytext = result.replace('\\r\\n','<br />')
-        q = Queue.objects.get(pk=q.id)
-        q.result = mytext
-        q.dateOut = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        q.save()
+        run_script_task.delay(q.id, command)
 
-        return HttpResponse(json.dumps(u.hex), content_type="application/json")
+        return HttpResponse(json.dumps(q.id), content_type="application/json")
 def result(request, uuid):
     if request.method == "GET":
         q = Queue.objects.get(uuid=uuid)
