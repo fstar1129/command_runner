@@ -169,12 +169,12 @@
             'param[]': JSON.stringify(param)
           },
           success: function(url) {
-              console.log(url);
+              // console.log(url);
               if(url === "error") {
                 alert("Error occurred!");
                 $("#run_script").attr("disabled", false);
               }else{
-                //window.location.href = "result/"+url;
+                window.location.href = "result/"+url;
               }
           }
         });
