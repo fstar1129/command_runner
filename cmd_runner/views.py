@@ -9,6 +9,10 @@ import uuid
 import html
 import time
 from cmd_runner.tasks import run_script_task
+import urllib
+from django.shortcuts import render, redirect
+from django.conf import settings
+from django.contrib import messages
 
 def index(request):
     all_command = Script.objects.all()
@@ -26,34 +30,49 @@ def change_script(request):
 
 def run_script(request):
     if request.method == 'POST':
-        command_id = request.POST.get('script')
-        param = json.loads(request.POST.get('param[]'))
-        currentDT = datetime.datetime.now()
-        script = Script.objects.get(pk=command_id)
-        u = uuid.uuid4()
-        q = Queue(dateIn=currentDT, script_id=script, uuid=u.hex)
-        q.save()
-        
-        k = 1
-        command = script.command
-        index = 0
-        for i in param:
-            p = Script_command.objects.get(pk=i['id'])
-            qp = QParam(value=i['value'], param_id=p, queue_id=q)
-            qp.save()
-            command = command.replace("%"+str(index + 1), i['value'])
-            index += 1
-        run_script_task.delay(q.id, command)
 
-        return HttpResponse(json.dumps(u.hex), content_type="application/json")
+        ''' Begin reCAPTCHA validation '''
+        recaptcha_response = request.POST.get('g-recaptcha-response')
+        url = 'https://www.google.com/recaptcha/api/siteverify'
+        values = {
+            'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+            'response': recaptcha_response
+        }
+        data = urllib.parse.urlencode(values).encode()
+        req =  urllib.request.Request(url, data=data)
+        response = urllib.request.urlopen(req)
+        result = json.loads(response.read().decode())
+        ''' End reCAPTCHA validation '''
+
+        if result['success']:
+            command_id = request.POST.get('script')
+            param = json.loads(request.POST.get('param[]'))
+            u = uuid.uuid4()
+            run_script_task.delay(command_id, param, u.hex)
+
+            return HttpResponse(json.dumps(u.hex), content_type="application/json")
+        else:
+            messages.error(request, 'Invalid reCAPTCHA. Please try again.')
+
+        return redirect('index')
 def result(request, uuid):
     if request.method == "GET":
-        q = Queue.objects.get(uuid=uuid)
-        context = {
-            'queue': q,
-            'result': q.result
-        }
-        return render(request, 'result.html', context=context)
+        try:
+            q = Queue.objects.get(uuid=uuid)
+            context = {
+                'queue': q,
+                'result': q.result
+            }
+            return render(request, 'result.html', context=context)
+        except Queue.DoesNotExist:
+            q = Queue.objects.get(uuid=uuid)
+            context = {
+                'queue': 'x',
+                'result': 'Running command on background'
+            }
+            return render(request, 'result.html', context=context)
+            
+
         
             
         
