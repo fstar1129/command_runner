@@ -1,5 +1,5 @@
 ## Command Runner website contains:
-* Run command and provide Link of output.
+* Run command on background using celery task on Django app
 
 
 
