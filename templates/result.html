@@ -67,13 +67,13 @@
     </div>
     <div class="col-sm-8">
         <p>SCRIPT: <span style="color:#4700a3">{{ queue.script_id.name}}</span></p>
-        <p>YOUR SCAN RESULT LINK:<br /><a href="localhost:8000/result/{{ queue.uuid }}">localhost:8000/result/{{ queue.uuid }}</a>
+        <p>YOUR SCAN RESULT LINK:<br /><a href="http://sectools4.me/result/{{ queue.uuid }}">http://sectools4.me/result/{{ queue.uuid }}</a>
           <button onclick="myFunction()" style="background-color:transparent;border-color:transparent">
             <img src="{% static 'icons8-copy-link-26.png' %}" width="20px" height="20px">
           </button>
         </p>
         
-        <input type="text" value="localhost:8000/result/{{ queue.uuid }}" id="myInput" class="copyform">
+        <input type="text" value="http://sectools4.me/result/{{ queue.uuid }}" id="myInput" class="copyform">
         <p>DATE: <span style="color:#4700a3">{{ queue.dateOut }}</span></p>
         
     </div>

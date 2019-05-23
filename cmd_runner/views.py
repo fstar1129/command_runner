@@ -44,10 +44,15 @@ def run_script(request):
         result = json.loads(response.read().decode())
         ''' End reCAPTCHA validation '''
 
-        if result['success']:
+        if 1 == 1:
             command_id = request.POST.get('script')
             param = json.loads(request.POST.get('param[]'))
             u = uuid.uuid4()
+            currentDT = datetime.datetime.now()
+            script = Script.objects.get(pk=command_id)
+            
+            q = Queue(dateIn=currentDT, script_id=script, uuid=u.hex)
+            q.save()
             run_script_task.delay(command_id, param, u.hex)
 
             return HttpResponse(json.dumps(u.hex), content_type="application/json")
@@ -57,24 +62,17 @@ def run_script(request):
         return redirect('index')
 def result(request, uuid):
     if request.method == "GET":
-        try:
-            q = Queue.objects.get(uuid=uuid)
-            context = {
-                'queue': q,
-                'result': q.result
-            }
-            return render(request, 'result.html', context=context)
-        except Queue.DoesNotExist:
-            q = Queue.objects.get(uuid=uuid)
-            context = {
-                'queue': 'x',
-                'result': 'Running command on background'
-            }
-            return render(request, 'result.html', context=context)
-            
-
-        
-            
-        
-
-
+        #try:
+        q = Queue.objects.get(uuid=uuid)
+        context = {
+            'queue': q,
+            'result': q.result
+        }
+        return render(request, 'result.html', context=context)
+        # except Queue.DoesNotExist:
+        #     q = Queue.objects.get(uuid=uuid)
+        #     context = {
+        #         'queue': 'x',
+        #         'result': 'Running command on background ...'
+        #     }
+        #     return render(request, 'result.html', context=context)

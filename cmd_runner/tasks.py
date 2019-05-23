@@ -5,11 +5,11 @@ import os
 
 @app.task
 def run_script_task(command_id, param, uuid):
-    currentDT = datetime.datetime.now()
+    #currentDT = datetime.datetime.now()
     script = Script.objects.get(pk=command_id)
     
-    q = Queue(dateIn=currentDT, script_id=script, uuid=uuid)
-    q.save()
+    q = Queue.objects.get(uuid=uuid)
+    # q.save()
     
     command = script.command
     index = 0
